@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.88.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="../css/normalize.css">
+<link rel="stylesheet" href="../css/skeleton.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="alternate" href="index.xml" type="application/rss+xml" title="Speech Research">
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<title>AdaSpeech 4: Adaptive Text to Speech in Zero-Shot Scenarios - Speech Research</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		
+			
+		
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="https://schema.org/BlogPosting">
+            <h1 class="entry-title" itemprop="headline">AdaSpeech 4: Adaptive Text to Speech in Zero-Shot Scenarios</h1>
+			
+			<section itemprop="entry-text">
+				<!-- ArXiv: [arXiv:2103.00993](https://arxiv.org/pdf/2103.00993.pdf) -->
+<h2 id="authors">Authors</h2>
+<ul>
+<li>Yihan Wu (Gaoling School of Artificial Intelligence, Renmin University of China) <a href="mailto:yihanwu@ruc.edu.cn">yihanwu@ruc.edu.cn</a></li>
+<li>Xu Tan^ (Microsoft Research Asia) <a href="mailto:xuta@microsoft.com">xuta@microsoft.com</a></li>
+<li>Bohan Li (Microsoft Azure Speech) <a href="mailto:bohli@microsoft.com">bohli@microsoft.com</a></li>
+<li>Lei He (Microsoft Azure Speech) <a href="mailto:helei@microsoft.com">helei@microsoft.com</a></li>
+<li>Sheng Zhao (Microsoft Azure Speech) <a href="mailto:szhao@microsoft.com">szhao@microsoft.com</a></li>
+<li>Ruihua Song^ (Gaoling School of Artificial Intelligence, Renmin University of China) <a href="mailto:rsong@ruc.edu.cn">rsong@ruc.edu.cn</a></li>
+<li>Tao Qin (Microsoft Research Asia) <a href="mailto:taoqin@microsoft.com">taoqin@microsoft.com</a></li>
+<li>Tie-Yan Liu (Microsoft Research Asia) <a href="mailto:tyliu@microsoft.com">tyliu@microsoft.com</a></li>
+</ul>
+<p><small>^ Corresponding authors.</small></p>
+<h2 id="abstract">Abstract</h2>
+<p>Adaptive text to speech (TTS) can synthesize new voices in zero-shot scenarios efficiently, by using a well-trained source TTS model without adapting it on the speech data of new speakers. 
+Considering seen and unseen speakers have diverse characteristics, zero-shot adaptive TTS requires strong generalization ability on speaker characteristics, which brings modeling challenges.<br>
+In this paper, we develop AdaSpeech 4, a zero-shot adaptive TTS system for high-quality speech synthesis. We model the speaker characteristics systematically to improve the generalization on new speakers. Generally, the modeling of speaker characteristics can be categorized into three steps: extracting speaker representation, taking this speaker representation as condition, and synthesizing speech/mel-spectrogram given this speaker representation. Accordingly, we improve the modeling in three steps:</p>
+<ol>
+<li>To extract speaker representation with better generalization, we factorize the speaker characteristics into basis vectors and extract speaker representation by weighted combining of these basis vectors through attention. 2) We leverage conditional layer normalization to integrate the extracted speaker representation to TTS model.</li>
+<li>We propose a novel supervision loss based on the distribution of basis vectors to maintain the corresponding speaker characteristics in generated mel-spectrograms. Without any fine-tuning, AdaSpeech 4 achieves better voice quality and similarity than baselines in multiple datasets.</li>
+</ol>
+<h2 id="model-architecture">Model Architecture</h2>
+<img src="../images/adaspeech4/arch.png" width="100%"/>
+<h2 id="abstract">Contents</h2>
+<b><a href="#audio-samples">1. Audio Samples</a></b><br>
+<a href="#1.1"> 1.1 Audio Samples Synthesized in Zero-Shot Scenarios</a><br>
+<a href="#1.2"> 1.2 Baseline Comparison</a><br>
+<b><a href="#ablation-studies">2. Ablation Studies</a></b><br>
+<a href="#2.1"> 2.1 The Effectiveness of Each Component</a><br>
+<a href="#2.2"> 2.2 The Number of basis vectors Analysis</a><br>
+<p><span id="audio-samples" name="audio-samples"></span></p>
+<h2 id="audio-samples">1. Audio Samples</h2>
+In zero-shot scenarios, we randomly select one audio from each speaker as reference. 
+<p><span id="1.1" name="1.1"></span></p>
+<h3 id="adaptation-voice-on-libritts-vctk-and-ljspeech">1.1 Audio Samples Synthesized in Zero-Shot Scenarios</h3>
+<!-- <p><em>Sample 1 : General Cheatham, all the time, was calling on the men to go forward, saying, "Come on, boys, and follow me."</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_5694.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_5694.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table> -->
+<p><em>Sample 1 : Three weeks had passed since the murder at Mr. Weishaupt's--three weeks the most agitated that had been known in this sequestered city.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6018.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6018.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 2 :That argument certainly weighed much in his favor.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6019.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6019.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 3 : But so definite had she been in expressing her wishes, that the girls felt that it was due her for lending her house to pay all deference to what she said.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6120.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6120.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 4 : He entered it.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6209.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6209.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 5 : But it was pleasant to hear her thus answer.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_5724.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_5724.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 6 : "Give it to me," said the king; and he took the paper.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6300.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6300.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 7 :Carpets everywhere.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6383.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6383.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 8 : Oh, Ethel, do try to forgive me!</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6345.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6345.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 9 : Several times after I repeated the same manoeuvre, but with as little success as before. As my pretence for withdrawing from the house was to allay my thirst, Kory-Kory either suspecting some design on my part, or else prompted by a desire to please me, regularly every evening placed a calabash of water by my side.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_637.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_637.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Sample 10 : Yet I cannot describe the curiosities to you.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/GT_6550.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_6550.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><span id="1.2" name="1.2"></span></p>
+<h3 id="adaptation-voice-on-libritts-vctk-and-ljspeech">1.2 Baseline Comparison</h3>
+<img src="../images/adaspeech4/table1.png" width="100%"/>
+<p><em>Speaker 1 (Male) : Then I went and I put my legs in place of his legs, and my hands in place of his forelegs, and my head in place of his head, and the horns on top of my head, so that the brute might think that it was the buck.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">FastSpeech (d-vector)</th>
+<th style="text-align: center">AdaSpeech</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/gt_00001001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/dvec_00001001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/ada1_00001001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_00001001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Speaker 2 (Male) : General Cheatham came up and advanced.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">FastSpeech (d-vector)</th>
+<th style="text-align: center">AdaSpeech</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/gt_00004001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/dvec_00004003.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/ada1_00004001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_00004001.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Speaker 3 (Female) : I suppose you did know?</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">FastSpeech (d-vector)</th>
+<th style="text-align: center">AdaSpeech</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/gt_00004002.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/dvec_00004002.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/ada1_00004002.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_00004002.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><em>Speaker 4 (Female) : I'm not anxious about myself, but about you," Annesley said.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<th style="text-align: center">FastSpeech (d-vector)</th>
+<th style="text-align: center">AdaSpeech</th>
+<th style="text-align: center">AdaSpeech 4</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/gt_00004001_F.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/dvec_00004001_F.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/baselines/ada1_00004001_F.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_00004001_F.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<p><span id="audio-studies" name="audio-studies"></span></p>
+<h2 id="ablation-studies">Ablation Studies</h2>
+<p><span id="2.1" name="2.1"></span></p>
+<h3 id="audios-of-ablation-study-on-vctk">2.1 The Effectiveness of Each Component</h3>
+In this section, we conduct ablation studies to verify the effectiveness of each component in AdaSpeech 4. As shown in Table 2, We observe that remove each components will lead the decrease of the voice quality.
+<img src="../images/adaspeech4/table2_ab.png" width="50%"/>
+<p><em>Transcript: "I'm not anxious about myself, but about you," Annesley said.</em></p>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/gt_00004001_F.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<th style="text-align: center">#1: AdaSpeech 4</th>
+<th style="text-align: center">#2: #1 - k-means initialization</th>
+<th style="text-align: center">#3: #1 - <i>L<sub>reg</sub></i></th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_00004001_F_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/2_wo_initial.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/3_wo_reg.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">#4: #1 - basis vectors</th>
+<th style="text-align: center">#5: #1 - encoder CLN</th>
+<th style="text-align: center">#6: #5 - decoder CLN</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/4_wo_basis_vectors.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/5_wo_enc_CLN.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/6_wo_dec_CLN.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">#7: #1 - <i>L<sub>dist</sub></i></th>
+<th style="text-align: center">#8: #7 + <i>L<sub>cos</sub></i></th>
+<th style="text-align: center">#9: #1 + <i>L<sub>cos</sub></i></th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/7_wo_dist.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/8_mix_loss.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/9_emb_loss.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<h3 id="audios-of-ablation-study-on-vctk">2.2 The Number of basis vectors Analysis</h3>
+As the number of basis vectors determines the variety of speaker features, we further investigate the speech synthesized in zero-shot scenarios. changes with different number of basis vectors on LibriTTS test set. As shown in Figure 2, the voice quality and similarity continuously drops when the number of basis vectors decreases from 2000, while there is no obvious gain when the number of basis vectors is greater than 2000. Thus, we choose 2000 in our experiments.
+<img src="../images/adaspeech4/fig2.png" width="50%"/>
+<table><thead>
+<tr>
+<th style="text-align: center">GT mel + HiFiGAN</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/gt/gt_00004001_F.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<th style="text-align: center">The number of basis vectors</th>
+<th style="text-align: center">Audio samples</th>
+</tr></thead><tbody>
+<tr>
+<td style="text-align: center">100</td> <td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/100_basis.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<td style="text-align: center">1000</td> <td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/1000_basis.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<td style="text-align: center">2000 (AdaSpeech 4)</td> <td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/adaspeech4/ada4_00004001_F_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<td style="text-align: center">5000</td> <td style="text-align: center"><audio controls="controls" ><source src="../audio/adaspeech4/base/libriTTS/ablation/5000_basis.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody></table>
+<h2 id="our-related-works">Our Related Works</h2>
+<p><a href="/adaspeech/">AdaSpeech: Adaptive Text to Speech for Custom Voice</a><br>
+<a href="/adaspeech2/">AdaSpeech 2: Adaptive Text to Speech with Untranscribed Data</a><br>
+<a href="/adaspeech3/">AdaSpeech 3: Adaptive Text to Speech for Spontaneous Style</a><br>
+<a href="/fastspeech/">FastSpeech: Fast, Robust and Controllable Text to Speech</a><br>
+<a href="/fastspeech2/">FastSpeech 2: Fast and High-Quality End-to-End Text to Speech</a><br>
+<a href="/multispeech/">MultiSpeech: Multi-Speaker Text to Speech with Transformer</a><br>
+<a href="/lrspeech/">LRSpeech: Extremely Low-Resource Speech Synthesis and Recognition</a><br></p>
+
+			</section>
+		</article>
+	</main>
+
+
+	
+
+</div>
+
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-139981676-1', 'auto');
+	ga('send', 'pageview');
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+         HTML: ["input/TeX","output/HTML-CSS"],
+         TeX: {
+                Macros: {
+                         bm: ["\\boldsymbol{#1}", 1],
+                         argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+                         argmin: ["\\mathop{\\rm arg\\,min}\\limits"]},
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+                equationNumbers: { autoNumber: "AMS" } },
+         extensions: ["tex2jax.js"],
+         jax: ["input/TeX","output/HTML-CSS"],
+         tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                    processEscapes: true },
+         "HTML-CSS": { availableFonts: ["TeX"],
+                       linebreaks: { automatic: true } }
+     });
+ </script>
+
+ <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+       tex2jax: {
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+       }
+     });
+ </script>
+
+ <script type="text/javascript" async
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+ </script>
+
+
+
+
+</body>
+</html>
+

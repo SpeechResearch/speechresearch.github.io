@@ -1,0 +1,805 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.40.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="../css/normalize.css">
+<link rel="stylesheet" href="../css/skeleton.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="alternate" href="index.xml" type="application/rss+xml" title="Speech Research">
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<title>Mixed-Phoneme BERT: Improving BERT with Mixed Phoneme and Sup-Phoneme Representations for Text to Speech - Speech Research</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		
+			
+		
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="https://schema.org/BlogPosting">
+            <h1 class="entry-title" itemprop="headline">Mixed-Phoneme BERT: Improving BERT with Mixed Phoneme and Sup-Phoneme Representations for Text to Speech</h1>
+			
+			<section itemprop="entry-text">
+				
+
+<p><br></p>
+
+<p>ArXiv: <a href="https://arxiv.org/pdf/2203.17190.pdf">arXiv:2203.17190</a></p>
+
+<h2 id="authors">Authors</h2>
+
+<ul>
+<li>Guangyan Zhang (The Chinese University of Hong Kong) <a href="mailto:gyzhang@link.cuhk.edu.hk">gyzhang@link.cuhk.edu.hk</a></li>
+<li>Kaitao Song (Microsoft Research Asia)</li>
+<li>Xu Tan (Microsoft Research Asia) <a href="mailto:xuta@microsoft.com">xuta@microsoft.com</a></li>
+<li>Daxin Tan (The Chinese University of Hong Kong)</li>
+<li>Yuzi Yan (Tsinghua University)</li>
+<li>Yanqing Liu (Microsoft Azure Speech)</li>
+<li>Gang Wang (Microsoft Azure Speech)</li>
+<li>Wei Zhou (Zhejiang University)</li>
+<li>Tao Qin (Microsoft Research Asia)</li>
+<li>Tan Lee (The Chinese University of Hong Kong)</li>
+<li>Sheng Zhao (Microsoft Azure Speech)</li>
+</ul>
+
+<h2 id="abstract">Abstract</h2>
+
+<p>Recently, leveraging BERT pre-training to improve the phoneme encoder in text to speech (TTS) has drawn increasing attention. However, the works apply pre-training with character-based units to enhance the TTS phoneme encoder, which is inconsistent with the TTS fine-tuning that takes phonemes as input. Pre-training only with phonemes as input can alleviate the input mismatch but lack the ability to model rich representations and sematic information due to limited phoneme vocabulary. In this paper, we propose Mixed-Phoneme BERT, a novel variant of the BERT model that uses mixed phoneme and sup-phoneme representations to enhance the learning capability. Specifically, we merge the adjacent phonemes into sup-phonemes and combine the phoneme sequence and the merged sup-phoneme sequence as the model input, which can enhance the model capacity to learn rich contextual representations. Experiment results demonstrate that our proposed Mixed-Phoneme BERT significantly improves the TTS performance with 0.30 CMOS gain compared with the FastSpeech 2 baseline. The Mixed-Phoneme BERT achieves $3\times$ inference speedup and similar voice quality to the previous TTS pre-trained model PnG BERT.</p>
+
+<div class="container">
+    <h2>Part 1. Audio Samples</h2>
+    <i>
+    These examples are randomly sampled from the MOS and CMOS evaluation set for <b> Table 1 </b> in the paper.
+    </i>
+
+  <h3> Audio Samples </h3>
+  <span>
+        1. The due relation of letter to pictures and other ornament was thoroughly understood by the old printers.
+  </span>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Recording</th>
+        <th>PWG copy synthesis</th>
+        <th>Fastspeech 2</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/gt/LJ001-0178.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pwg/LJ001-0178.wav" controls=""></audio>
+        </td>    
+        <td>
+                <audio src="../audio/mpbert/table1/fs2/T000020.wav" controls=""></audio>
+        </td>    
+      </tr>
+
+    </tbody>
+  </table>
+
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with unpre-trained Mixed-Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/unpre-mp/T000020.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pre-mp/T000020.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- second sentence -->
+
+  <span>
+                2. Printing, then, for our purpose, may be considered as the art of making books by means of movable types.
+  </span>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Recording</th>
+        <th>PWG copy synthesis</th>
+        <th>Fastspeech 2</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/gt/LJ001-0009.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pwg/LJ001-0009.wav" controls=""></audio>
+        </td>    
+        <td>
+                <audio src="../audio/mpbert/table1/fs2/T000023.wav" controls=""></audio>
+        </td>    
+      </tr>
+
+    </tbody>
+  </table>
+
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with unpre-trained Mixed-Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/unpre-mp/T000023.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pre-mp/T000023.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+<!-- Third sentences -->
+
+ <span>
+                3. Scientific studies have evaluated surgical masks, but relatively few have looked at whether cloth masks can stop virus transmission.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 </th>
+        <th>Fastspeech 2 with unpre-trained Mixed-Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/fs2/T000001.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/unpre-mp/T000001.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pre-mp/T000001.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+<!-- Third sentences -->
+
+ <span>
+                4. It has carried out three orbital corrections as well as equipment tests and remains in good condition.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 </th>
+        <th>Fastspeech 2 with unpre-trained Mixed-Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/fs2/T000036.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/unpre-mp/T000036.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pre-mp/T000036.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+  <!-- Third sentences -->
+
+ <span>
+                5. The dialogue between Europe and China has strengthened and become more balanced these past few years.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 </th>
+        <th>Fastspeech 2 with unpre-trained Mixed-Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table1/fs2/T000040.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/unpre-mp/T000040.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table1/pre-mp/T000040.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+<h3> Compared with the PnG BERT </h3>
+    <i>
+        These examples are sampled from the CMOS evaluation set for <b> Table 2 </b> in the paper.
+    </i>
+
+      <!-- First sentences -->
+</br>
+ <span>
+                1. Sometimes the notion of going out to a movie theater seems like a dream from previous life.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained Png BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2_new/png/T000008.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2_new/mp/T000008.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+    <!-- Second sentences -->
+
+ <span>
+                2. The fire or light, when kept in by the eyelids, equalizes the inward motions, and there is rest accompanied by few dreams.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained PnG BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2_new/png/T000016.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2_new/mp/T000016.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+    <!-- Third sentences -->
+
+ <span>
+                3. For although the Chinese took impressions from wood blocks engraved in relief for centuries before the wood-cutters of the Netherlands.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained PnG BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2_new/png/T000021.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2_new/mp/T000021.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+    <!-- Forth sentences -->
+
+ <span>
+                4. Very much of squalor and discomfort will be endured before the last trinket or the last pretense of pecuniary decency is put away.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained PnG BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2_new/png/T000022.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2_new/mp/T000022.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+    <!-- Fifth sentences -->
+
+ <span>
+                5. Printing, then, for our purpose, may be considered as the art of making books by means of movable types.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained PnG BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2_new/png/T000023.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2_new/mp/T000023.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+<h2>Part 2. Ablation Studies </h2>
+
+<h3>The Effectiveness of Mixed Phoneme and Sup-Phoneme Representations </h3>
+    <i>
+    These examples are sampled from the CMOS evaluation set for <b> Table 3 </b> in the paper.
+    </i>
+
+  <!-- First sentences -->
+</br>
+ <span>
+                1. In the meantime, renters who have lost their jobs or are sick because of the virus should contact their landlords.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2/pre-p/T000007.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2/pre-mp/T000007.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+    <!-- Second sentences -->
+
+ <span>
+                2. Sometimes the notion of going out to a movie theater seems like a dream from previous life.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2/pre-p/T000008.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2/pre-mp/T000008.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+    <!-- Third sentences -->
+
+ <span>
+                3. All this comes at a moment when MLB faces a labor crisis that threatens the future of the entire industry.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2/pre-p/T000012.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2/pre-mp/T000012.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+    <!-- Forth sentences -->
+
+ <span>
+                4. The fire or light, when kept in by the eyelids, equalizes the inward motions, and there is rest accompanied by few dreams.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2/pre-p/T000016.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2/pre-mp/T000016.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+    <!-- Fifth sentences -->
+
+ <span>
+                5. I told them I knew no remedy but leaving me behind next time, and could have told them that my looks were suitable to my fortune, though not to a feast.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Fastspeech 2 with pre-trained Phoneme BERT</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table2/pre-p/T000017.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table2/pre-mp/T000017.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+
+
+<h3>The Effectiveness of Fine-Tuning Strategy </h3>
+    <i>
+    These examples are sampled from the CMOS evaluation set for <b> Table 4 </b> in the paper.
+    </i>
+
+  <!-- First sentences -->
+</br>
+ <span>
+                1. As demand is expected to be huge, an expert panel will help screen the proposals for the most promising candidates. 
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>only phoneme</th>
+        <th>only sub-phoneme</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+                <audio src="../audio/mpbert/table3/only-ph/T000035.wav" controls=""></audio>
+        </td>
+
+
+        <td>
+                <audio src="../audio/mpbert/table3/only-sup/T000035.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table3/pre-mp/T000035.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+    <!-- Second sentences -->
+
+ <span>
+                2. His hosts, on the other hand, wore an uneasy manner that might have been the hallmark of conscious depravity.
+  </span>
+   <table class="table table-hover">
+    <thead>
+        <tr>
+        <th>only phoneme</th>
+        <th>only sub-phoneme</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+       <td>
+                <audio src="../audio/mpbert/table3/only-ph/T000034.wav" controls=""></audio>
+        </td>
+
+
+        <td>
+                <audio src="../audio/mpbert/table3/only-sup/T000034.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table3/pre-mp/T000034.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+    <!-- Third sentences -->
+
+ <span>
+                3. Whether much or little consideration had been directed to the result, Miss Chancellor certainly would not have incurred this reproach.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>only phoneme</th>
+        <th>only sub-phoneme</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+       <td>
+                <audio src="../audio/mpbert/table3/only-ph/T000033.wav" controls=""></audio>
+        </td>
+
+
+        <td>
+                <audio src="../audio/mpbert/table3/only-sup/T000033.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table3/pre-mp/T000033.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+    <!-- Forth sentences -->
+
+ <span>
+                4. Most of Caxton's own types are of an earlier character, though they also much resemble Flemish or Cologne letter.
+  </span>
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>only phoneme</th>
+        <th>only sub-phoneme</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+         <td>
+                <audio src="../audio/mpbert/table3/only-ph/T000032.wav" controls=""></audio>
+        </td>
+
+
+        <td>
+                <audio src="../audio/mpbert/table3/only-sup/T000032.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table3/pre-mp/T000032.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+    <!-- Fifth sentences -->
+
+ <span>
+                5. I have a remedy against thirst, quite contrary to that which is good against the biting of a mad dog.
+  </span>
+   <table class="table table-hover">
+    <thead>
+       <tr>
+        <th>only phoneme</th>
+        <th>only sub-phoneme</th>
+        <th>Fastspeech 2 with pre-trained Mixed-Phoneme BERT</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+       <td>
+                <audio src="../audio/mpbert/table3/only-ph/T000025.wav" controls=""></audio>
+        </td>
+
+
+        <td>
+                <audio src="../audio/mpbert/table3/only-sup/T000025.wav" controls=""></audio>
+        </td>
+
+        <td>
+                <audio src="../audio/mpbert/table3/pre-mp/T000025.wav" controls=""></audio>
+        </td>       
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+
+
+
+
+</div>
+
+			</section>
+		</article>
+	</main>
+
+
+	
+
+</div>
+
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-139981676-1', 'auto');
+	ga('send', 'pageview');
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+         HTML: ["input/TeX","output/HTML-CSS"],
+         TeX: {
+                Macros: {
+                         bm: ["\\boldsymbol{#1}", 1],
+                         argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+                         argmin: ["\\mathop{\\rm arg\\,min}\\limits"]},
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+                equationNumbers: { autoNumber: "AMS" } },
+         extensions: ["tex2jax.js"],
+         jax: ["input/TeX","output/HTML-CSS"],
+         tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                    processEscapes: true },
+         "HTML-CSS": { availableFonts: ["TeX"],
+                       linebreaks: { automatic: true } }
+     });
+ </script>
+
+ <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+       tex2jax: {
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+       }
+     });
+ </script>
+
+ <script type="text/javascript" async
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+ </script>
+
+
+
+
+<script data-no-instant>document.write('<script src="/livereload.js?port=1313&mindelay=10"></' + 'script>')</script></body>
+</html>
+
