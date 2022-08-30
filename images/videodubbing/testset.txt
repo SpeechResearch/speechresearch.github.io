@@ -1,0 +1,159 @@
+-----------------------------------------------------------------------------
+Real-World Video Dubbing Test Set
+
+Version 1.0
+August 30, 2022
+-----------------------------------------------------------------------------
+
+
+1. OVERVIEW
+
+Considering the scarcity of real-world video dubbing dataset (i.e., motion pictures with golden cross-lingual
+source and target speech), we construct a test set collected from dubbed films to provide comprehensive evaluations 
+of video dubbing systems.
+
+We select nine popular films translated from English to Chinese, which are of high manual translation
+and dubbing quality, and contain rich genres such as love, action, scientific fiction, etc.
+
+
+2. PROCESS
+
+With the aim of preventing copyright infringement, we provide the processing pipeline of test set, instead of the original data set. 
+The following is the processing pipeline for the test set.
+
+2.1 Download Films
+    In this work, we select nine popular films translated from English to Chinese, which are of high manual translation
+    and dubbing quality, and contain rich genres such as love, action, scientific fiction, etc.
+
+    Here is the list of films:
+    ===============
+    |
+    .- Iron Man 1
+    |
+    .- Iron Man 2
+    |
+    .- Captain America 3
+    |
+    .- The Notebook
+    |
+    .- Flipped
+    |
+    .- About Time
+    |
+    .- Fast & Furious 1
+    |
+    .- Fast & Furious 2
+    |
+    .- A Walk in the Clouds
+
+2.2 Cut conversation clips from films
+    Following these criteria: 
+        1) The clip duration is around 1 ∼ 3 minutes. 
+        2) More than 10 sentences are involved in each clip, which contains both long and short sentences.
+        3) The face of speaker is visible mostly during his or her talks, especially visible lips at the end of speech.
+    Here are clips we cut from fils:
+    ===============
+    |
+    .- Iron Man 1
+        |
+        .- 65:55 ~ 66:30
+        |
+        .- 69:55 ~ 70:38
+    .- Iron Man 2
+        |
+        .- 12:12 ~ 13:04
+        |
+        .- 39:15 ~ 41:20
+        |
+        .- 43:32 ~ 34:19
+        |
+        .- 64:20 ~ 65:57
+        |
+        .- 110:42 ~ 111:28
+    .- Captain America 3
+        |
+        .- 16:42 ~ 18:12
+        |
+        .- 19:02 ~ 20:16
+        |
+        .- 20:14 ~ 21:18
+        |
+        .- 22:08 ~ 23:35
+        |
+        .- 27:07 ~ 30:38
+        |
+        .- 29:59 ~ 30:40
+        |
+        .- 50: 43 ~ 52:37
+        |
+        .- 74:26 ~ 75:07
+        |
+        .- 77:15 ~ 78:23
+        |
+        .- 122:19 ~ 124:14
+    .- The Notebook
+        |
+        .- 04:08 ~ 05:08
+        |
+        .- 08:52 ~ 10:31
+    .- Flipped
+        |
+        .- 10:35 ~ 11:04
+        |
+        .- 12:05 ~ 13:14
+        |
+        .- 28:41 ~ 29:59
+        |
+        .- 34:30 ~ 36: 08
+        |
+        .- 36:58 ~ 38:00
+        |
+        .- 59:25 ~ 61:11
+    .- About Time
+        |
+        .- 04:37 ~ 06:26
+        |
+        .- 09:06 ~ 10:06
+        |
+        .- 13:52 ~ 14:47
+        |
+        .- 15:17 ~ 16:15
+        |
+        .- 36:31 ~ 38:00
+        |
+        .- 62:06 ~ 63:15
+    .- Fast & Furious 1
+        |
+        .- 35:08 ~ 36:02
+        |
+        .- 36:14 ~ 36:30
+        |
+        .- 37:15 ~ 37:49
+        |
+        .- 55:03 ~ 56:02
+    .- Fast & Furious 2
+        |
+        .- 15:45 ~ 17:17
+        |
+        .- 36:07 ~ 37:22
+        |
+        .- 66:33 ~ 67:30
+        |
+        .- 69:40 ~ 70:30
+    .- A Walk in the Clouds
+        |
+        .- 17:10 ~ 18:52
+        |
+        .- 30:55 ~ 32:17
+        |
+        .- 61:14 ~ 62:26
+
+2.3 Automatic Speech Recognition (ASR)
+    Perform speech recognition and manual correction to obtain text transcripts in source and target languages.
+    We recommend using Microsoft Azure's ASR service (https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text/?cdn=disable#features), 
+    which is highly accurate and efficient.
+
+2.4 Split clips into sentences 
+    Clips are split into sentences based on semantics and speakers. 
+    Please discard silence frames between sentences to make sure there is no 
+    more than 0.5s of silence at the beginning and end of each split.
