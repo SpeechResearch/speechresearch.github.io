@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.66.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="../css/normalize.css">
+<link rel="stylesheet" href="../css/skeleton.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="alternate" href="index.xml" type="application/rss+xml" title="Speech Research">
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<title>PromptTTS: controllable text-to-speech with text descriptions - Speech Research</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		
+			
+		
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="https://schema.org/BlogPosting">
+            <h1 class="entry-title" itemprop="headline">PromptTTS: controllable text-to-speech with text descriptions</h1>
+			
+			<section itemprop="entry-text">
+				<br>
+<!-- Paper: <a href="../papers/fastspeech_2019.pdf">FastSpeech: Fast, Robust and Controllable Text to Speech</a> -->
+<!-- <p>ArXiv: <a href="https://arxiv.org/abs/2205.14807">arXiv:2205.14807</a></p>
+<p>Reddit Discussions: <a href="https://www.reddit.com/r/MachineLearning/comments/v1nh2o/r_binauralgrad_a_twostage_conditional_diffusion/?utm_source=share&utm_medium=web2x&context=3">Click me</a></p>
+<p>Code: <a href="https://github.com/microsoft/NeuralSpeech/tree/master/BinauralGrad">Click me</a></p> -->
+
+<h2 id="authors">Authors</h2>
+<ul>
+<li>Zhifang Guo* <a href="mailto:zhifangguo9@gmail.com">zhifangguo9@gmail.com</a></li>
+<li>Yichong Leng* (University of Science and Technology of China) <a href="mailto:lyc123go@mail.ustc.edu.cn">lyc123go@mail.ustc.edu.cn</a></li>
+<li>Yihan Wu (Renmin University of China) <a href="mailto:yihanwu@ruc.edu.cn">yihanwu@ruc.edu.cn</a></li>
+<li>Sheng Zhao (Microsoft Azure Speech) <a href="mailto:szhao@microsoft.com">szhao@microsoft.com</a></li>
+<li>Xu Tan^ (Microsoft Research Asia) <a href="mailto:xuta@microsoft.com">xuta@microsoft.com</a></li>
+</ul>
+<p><small>* Equal contribution.</small></p>
+<p><small>^ Corresponding author.</small></p>
+
+
+<h2 id="abstract">Abstract</h2>
+<p> Using a text description as prompt to guide the generation of text or images (e.g., GPT-3 or DALLE-2) has drawn wide attention recently. Beyond text and image generation, in this work, we explore the possibility of utilizing text descriptions to guide speech synthesis. Thus, we develop a text-to-speech (TTS) system (dubbed as PromptTTS) that takes a prompt with both style and content descriptions as input to synthesize the corresponding speech. Specifically, PromptTTS consists of a style encoder and a content encoder to extract the corresponding representations from the prompt, and a speech decoder to synthesize speech according to the extracted style and content representations. Compared with previous works in controllable TTS that require users to have acoustic knowledge to understand style factors such as prosody and pitch, PromptTTS is more user-friendly since text descriptions are a more natural way to express speech style (e.g., ''A lady whispers to her friend slowly''). Given that there is no TTS dataset with prompts, to benchmark the task of PromptTTS, we construct and release a dataset containing prompts with style and content information and the corresponding speech. Experiments show that PromptTTS can generate speech with precise style control and high speech quality. Audio samples and our dataset are publicly available.</p>
+
+
+<h2 id="content">Content</h2>
+<b><a href="#dataset">1. Dataset</a></b><br>
+<a href="#promptspeech">1.1 PromptSpeech</a><br>
+<b><a href="#audio samples">2. Audio Samples</a></b><br>
+<a href="#Part 1">2.1 Comparison of Different Speech Styles</a><br>
+<a href="#Part 2">2.2 Comparison of Different Style Prompts</a><br>
+<a href="#Part 3">2.3 Comparison of Different Systems</a><br>
+
+<h2 id="dataset">1. Dataset</h2>
+<p> Given that there are no TTS datasets with prompts, we construct and release a dataset called PromptSpeech which consists of speech and the corresponding prompts. We synthesize speech with 5 different style factors (gender, pitch, speaking speed, volume, and emotion) from a commercial TTS <a href="https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/#overview">API</a>. The emotion factor has 5 categories and the gender factor has 2 categories. For the rest of style factors including pitch, speaking speed, and volume, we extract the value of style factors from speech with signal processing tools and divide speech into 3 categories (high/normal/low) according to the proportion. Considering that the style of speech can be described in natural language, we ask experts to write style prompts for each category. To further augment the style prompts, we utilize SimBERT to generate more style prompts with similar semantics. The speech and the corresponding prompt describing the same style and content are used as paired data in our dataset.</p>
+<p> Since there could be a gap between the synthesized speech and the real speech, besides the dataset mentioned above (denoted as synthesized version), we also construct a dataset (denoted as real version) with real speech data from LibriTTS by similar construction process. Due to the lack of emotion in LibriTTS, the real version of PromptSpeech only has 4 style factors. As shown in the table below, we split both versions of PromptSpeech into training sets and test sets, which are released in public. The experiments are conducted on PromptSpeech to verify the effectiveness of PromptTTS.</p>
+
+<h3 id="promptspeech">1.1 PromptSpeech</h3>
+<p> You can download the both versions of PromptSpeech from the table below and the number in the table corresponds to the amount of downloaded data.</p>
+<table><thead>
+<tr>
+<th style="text-align: center">Version</th>
+<th style="text-align: center">Training Prompt</th>
+<th style="text-align: center">Test Prompt</th>
+<th style="text-align: center">Speech</th>
+</tr></thead><tbody>
+<tr>
+<td>Synthesized</td>
+<td><a href="../dataset/promptspeech/Synthesized_training.zip">155092</a></td>
+<td><a href="../dataset/promptspeech/Synthesized_test.zip">5032</a></td>
+<td>160124</td>
+<!-- <td><a href="https://msramldl.blob.core.windows.net/modelrelease/PromptTTS/EMO.zip">160124</a></td> -->
+</tr>
+<tr>
+<td>Real</td>
+<td><a href="../dataset/promptspeech/Real_training.zip">26588</a></td>
+<td><a href="../dataset/promptspeech/Real_test.zip">1305</a></td>
+<td><a href="http://www.openslr.org/60/">27893</a></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="audio samples">2. Audio Samples</h2>
+<p> The following parts are the audio samples on both versions of PromptSpeech from PromptTTS and the two-stage baseline system. Note that we show PromptTTS from 3 parts as follows.</p>
+<p> <b>Comparison of Different Speech Styles</b>: we aim to show that we can control a specific style factor with the prompts of different meaning.</p>
+<p> <b>Comparison of Different Style Prompts</b>: we aim to show that promptTTS can synthesize speech in the same style with the different prompts of the same meaning.</p>
+<p> <b>Comparison of Different Systems</b>: we aim to show PromptTTS can synthesize speech in a more consistent style with the intention of prompts than baseline.</p>
+
+<h3 id="Part 1">2.1 Comparison of Different Speech Styles</h3>
+<p> Note that audio samples in this part are from PromptTTS with the prompts of different meaning to control a specific style factor.</p>
+<h4 id="synthesized1">2.1.1 Synthesized Version</h4>
+
+<h5 id="gender1">2.1.1.1 Gender</h5>
+<p>Gender-1: <em>Please ask a <b>man</b> with a normal voice to say: So Tom took his father's pipes and walked over the hill to farmer Bowser's house; for you must know that.</em></p>
+<p>Gender-2: <em>Please ask a <b>woman</b> with a normal voice to say: So Tom took his father's pipes and walked over the hill to farmer Bowser's house; for you must know that.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Gender-1</th>
+<th style="text-align: center">Gender-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/gender/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/gender/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="pitch1">2.1.1.2 Pitch</h5>
+<p>Pitch-1: <em>His voice has a <b>low pitch</b>: What shall we do, he asked his father.</em></p>
+<p>Pitch-2: <em>His voice has a <b>normal pitch</b>: What shall we do, he asked his father.</em></p>
+<p>Pitch-3: <em>His voice has a <b>high pitch</b>: What shall we do, he asked his father.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Pitch-1</th>
+<th style="text-align: center">Pitch-2</th>
+<th style="text-align: center">Pitch-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/pitch/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/pitch/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/pitch/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="speed1">2.1.1.3 Speaking Speed</h5>
+<p>Speaking Speed-1: <em>Please speak at a <b>slow speed</b>, gentleman: This man Tom, Tom, the piper's son, was hungry when the day begun; he wanted a bun and asked for one, but soon found out that there were none.</em></p>
+<p>Speaking Speed-2: <em>Please speak at a <b>normal speed</b>, gentleman: This man Tom, Tom, the piper's son, was hungry when the day begun; he wanted a bun and asked for one, but soon found out that there were none.</em></p>
+<p>Speaking Speed-3: <em>Please speak at a <b>fast speed</b>, gentleman: This man Tom, Tom, the piper's son, was hungry when the day begun; he wanted a bun and asked for one, but soon found out that there were none.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Speaking Speed-1</th>
+<th style="text-align: center">Speaking Speed-2</th>
+<th style="text-align: center">Speaking Speed-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/speed/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/speed/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/speed/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="volume1">2.1.1.4 Volume</h5>
+<p>Volume-1: <em>Generate a boy's voice with a <b>low volume</b> for me: Tom did not like to steal, but he had no one to teach him to be honest, and so, under his father's guidance, he fell into bad ways.</em></p>
+<p>Volume-2: <em>Generate a boy's voice with a <b>normal volume</b> for me: Tom did not like to steal, but he had no one to teach him to be honest, and so, under his father's guidance, he fell into bad ways.</em></p>
+<p>Volume-3: <em>Generate a boy's voice with a <b>high volume</b> for me: Tom did not like to steal, but he had no one to teach him to be honest, and so, under his father's guidance, he fell into bad ways.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Volume-1</th>
+<th style="text-align: center">Volume-2</th>
+<th style="text-align: center">Volume-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/volume/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/volume/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/volume/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="emotion1">2.1.1.5 Emotion</h5>
+<p>Emotion-1: <em>Look, that man <b>says</b> to his friend: Tom, Tom, the piper's son, stole a pig and away he run; the pig was eat and Tom was beat and Tom ran crying down the street.</em></p>
+<p>Emotion-2: <em>Look, that man <b>shouts</b> to his friend: Tom, Tom, the piper's son, stole a pig and away he run; the pig was eat and Tom was beat and Tom ran crying down the street.</em></p>
+<p>Emotion-3: <em>Look, that man <b>whispers</b> to his friend: Tom, Tom, the piper's son, stole a pig and away he run; the pig was eat and Tom was beat and Tom ran crying down the street.</em></p>
+<p>Emotion-4: <em>Look, that man <b>says cheerfully</b> to his friend: Tom, Tom, the piper's son, stole a pig and away he run; the pig was eat and Tom was beat and Tom ran crying down the street.</em></p>
+<p>Emotion-5: <em>Look, that man <b>says sadly</b> to his friend: Tom, Tom, the piper's son, stole a pig and away he run; the pig was eat and Tom was beat and Tom ran crying down the street.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Emotion-1</th>
+<th style="text-align: center">Emotion-2</th>
+<th style="text-align: center">Emotion-3</th>
+<th style="text-align: center">Emotion-4</th>
+<th style="text-align: center">Emotion-5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/emotion/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/emotion/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/emotion/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/emotion/PromptTTS_3.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Synthesized/emotion/PromptTTS_4.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="real1">2.1.2 Real Version</h4>
+<h5 id="gender2">2.1.2.1 Gender</h5>
+<p>Gender-1: <em>Provide me with a <b>male</b> voice: Go hungry, replied Barney, unless you want to take my pipes and play in the village.</em></p>
+<p>Gender-2: <em>Provide me with a <b>female</b> voice: Go hungry, replied Barney, unless you want to take my pipes and play in the village.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Gender-1</th>
+<th style="text-align: center">Gender-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/gender/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/gender/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="pitch2">2.1.2.2 Pitch</h5>
+<p>Pitch-1: <em>She said in a <b>deep</b> voice: There was not a worse vagabond in Shrewsbury than old Barney the piper.</em></p>
+<p>Pitch-2: <em>She said in a <b>sharp</b> voice: There was not a worse vagabond in Shrewsbury than old Barney the piper.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Pitch-1</th>
+<th style="text-align: center">Pitch-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/pitch/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/pitch/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="speed2">2.1.2.3 Speaking Speed</h5>
+<p>Speaking Speed-1: <em>I want to hear that girl talk <b>slowly</b>: Tom, the piper's son</em></p>
+<p>Speaking Speed-2: <em>I want to hear that girl talk <b>quickly</b>: Tom, the piper's son</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Speaking Speed-1</th>
+<th style="text-align: center">Speaking Speed-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/speed/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/speed/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="volume2">2.1.2.4 Volume</h5>
+<p>Volume-1: <em>Let's speak in a <b>low voice</b>, ladies!: Tom did not like to steal, but he had no one to teach him to be honest, and so, under his father's guidance, he fell into bad ways.</em></p>
+<p>Volume-2: <em>Let's speak in a <b>high voice</b>, ladies!: Tom did not like to steal, but he had no one to teach him to be honest, and so, under his father's guidance, he fell into bad ways.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Volume-1</th>
+<th style="text-align: center">Volume-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/volume/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part1/Real/volume/PromptTTS_2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+
+<h3 id="Part 2">2.2 Comparison of Different Style Prompts</h3>
+<p> Note that audio samples in this part are from PromptTTS with the different prompts of the same meaning to synthesize the speech in the same style.</p>
+<h4 id="synthesized2">2.2.1 Synthesized Version</h4>
+<p>Gender-1: <em>Ask a <b>boy</b> to speak with normal speed and volume: Tom, the piper's son.</em></p>
+<p>Gender-2: <em>I need a <b>man</b> with a normal voice to talk: Tom, the piper's son.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Gender-1</th>
+<th style="text-align: center">Gender-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/gender/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/gender/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Pitch-1: <em>The <b>boy's</b> voice is very <b>sharp</b>: Tom, the piper's son.</em></p>
+<p>Pitch-2: <em>Synthesize a very <b>squeaky</b> voice and ask <b>him</b> to say: Tom, the piper's son.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Pitch-1</th>
+<th style="text-align: center">Pitch-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/pitch/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/pitch/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Speaking Speed-1: <em>Generate a <b>male</b> voice with <b>slow</b> speaking speed, please: Tom, the piper's son.</em></p>
+<p>Speaking Speed-2: <em><b>He</b> spoke even more <b>slowly</b> than usual: Tom, the piper's son.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Speaking Speed-1</th>
+<th style="text-align: center">Speaking Speed-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/speed/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/speed/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Volume-1: <em><b>Gentlemen</b>, please talk <b>softly</b>: Tom, the piper's son.</em></p>
+<p>Volume-2: <em>Could you please help me generate a <b>manlike</b> voice to talk with me in a <b>low voice</b>: Tom, the piper's son.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Volume-1</th>
+<th style="text-align: center">Volume-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/volume/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Synthesized/volume/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="real2">2.2.2 Real Version</h4>
+<p>Pitch-1: <em>Please let a <b>lady</b> speak for me and <b>she</b> has a very <b>deep</b> voice: He never did any work except to play the pipes, and he played so badly that few pennies ever found their way into his pouch.</em></p>
+<p>Pitch-2: <em>The <b>woman</b> has a <b>low-pitched</b> voice: He never did any work except to play the pipes, and he played so badly that few pennies ever found their way into his pouch.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Pitch-1</th>
+<th style="text-align: center">Pitch-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Real/pitch/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Real/pitch/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Volume-1: <em>I want a <b>loud</b> <b>female</b> voice: He never did any work except to play the pipes, and he played so badly that few pennies ever found their way into his pouch.</em></p>
+<p>Volume-2: <em>This <b>madam</b> talks to me with <b>high volume</b>: He never did any work except to play the pipes, and he played so badly that few pennies ever found their way into his pouch.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Volume-1</th>
+<th style="text-align: center">Volume-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Real/volume/PromptTTS_0.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part2/Real/volume/PromptTTS_1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="Part 3">2.3 Comparison of Different Systems</h3>
+<p> Note that audio samples in this part are from PromptTTS and the two-stage baseline system (denoted as Two-stage) with the same prompts, which shows that PromptTTS can synthesize speech in a more consistent style with the intention of prompts than baseline.</p>
+<h4 id="synthesized3">2.3.1 Synthesized Version</h4>
+<p>PromptTTS: <em>Listen, <b>she</b> <b>increased her speaking speed</b>: There was not a worse vagabond in Shrewsbury than old Barney the piper.</em></p>
+<p>Two-stage: <em>Listen, <b>she</b> <b>increased her speaking speed</b>: There was not a worse vagabond in Shrewsbury than old Barney the piper.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<th style="text-align: center">Two-stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part3/Synthesized/speed/PromptTTS.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part3/Synthesized/speed/Two-stage.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>PromptTTS: <em><b>Reduce the volume</b> of <b>her</b> voice for me: There was not a worse vagabond in Shrewsbury than old Barney the piper.</em></p>
+<p>Two-stage: <em><b>Reduce the volume</b> of <b>her</b> voice for me: There was not a worse vagabond in Shrewsbury than old Barney the piper.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<th style="text-align: center">Two-stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part3/Synthesized/volume/PromptTTS.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part3/Synthesized/volume/Two-stage.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="real3">2.3.2 Real Version</h4>
+<p>PromptTTS: <em>Please find a <b>girl</b> to talk at a <b>higher pitch</b> than usual: Barney had one son, named Tom; and they lived all alone in a little hut away at the end of the village street, for Tom's mother had died when he was a baby.</em></p>
+<p>Two-stage: <em>Please find a <b>girl</b> to talk at a <b>higher pitch</b> than usual: Barney had one son, named Tom; and they lived all alone in a little hut away at the end of the village street, for Tom's mother had died when he was a baby.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<th style="text-align: center">Two-stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part3/Real/pitch/PromptTTS.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts/Part3/Real/pitch/Two-stage.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="our-related-works">Our Related Works</h2>
+<p>
+<a href="https://speechresearch.github.io/">Some speech research conducted at Microsoft Research Asia</a><br>	
+<a href="/naturalspeech/">NaturalSpeech: End-to-End Text to Speech Synthesis with Human-Level Quality</a><br>
+<a href="/binauralgrad/">BinauralGrad: A Two-Stage Conditional Diffusion Probabilistic Model for Binaural Audio Synthesis</a><br>
+<a href="/fastspeech/">FastSpeech: Fast, Robust and Controllable Text to Speech</a><br>
+<a href="/fastspeech2/">FastSpeech 2: Fast and High-Quality End-to-End Text-to-Speech</a><br>
+<a href="/adaspeech/">AdaSpeech: Adaptive Text to Speech for Custom Voice</a><br>
+<a href="/adaspeech2/">AdaSpeech 2: Adaptive Text to Speech with Untranscribed Data</a><br>
+<a href="/adaspeech3/">AdaSpeech 3: Adaptive Text to Speech for Spontaneous Style</a><br>
+<a href="/adaspeech4/">AdaSpeech 4: Adaptive Text to Speech in Zero-Shot Scenarios</a><br>
+<a href="/priorgrad/">PriorGrad: Improving Conditional Denoising Diffusion Models with Data-Dependent Adaptive Prior</a><br>
+</p>
+
+			</section>
+		</article>
+	</main>
+
+</div>
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-139981676-1', 'auto');
+	ga('send', 'pageview');
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+         HTML: ["input/TeX","output/HTML-CSS"],
+         TeX: {
+                Macros: {
+                         bm: ["\\boldsymbol{#1}", 1],
+                         argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+                         argmin: ["\\mathop{\\rm arg\\,min}\\limits"]},
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+                equationNumbers: { autoNumber: "AMS" } },
+         extensions: ["tex2jax.js"],
+         jax: ["input/TeX","output/HTML-CSS"],
+         tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                    processEscapes: true },
+         "HTML-CSS": { availableFonts: ["TeX"],
+                       linebreaks: { automatic: true } }
+     });
+ </script>
+
+ <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+       tex2jax: {
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+       }
+     });
+ </script>
+
+ <script type="text/javascript" async
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+ </script>
+
+
+
+
+</body>
+</html>
+
