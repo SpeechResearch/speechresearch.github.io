@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.88.1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href=""https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+	<link rel="stylesheet" href="css/custom.css">
+	<link rel="stylesheet" href="css/normalize.css">
+
+	<title>NaturalSpeech 2</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body data-new-gr-c-s-check-loaded="14.1091.0" data-gr-ext-installed="">
+
+<div class="container" >
+<header role="banner">
+</header>
+<main role="main">
+<article itemscope itemtype="https://schema.org/BlogPosting">
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<div class="text-center">
+	<h1>NaturalSpeech 2:</h1>
+        <h3>Latent Diffusion Models are Natural and Zero-Shot Speech and Singing Synthesizers</h3>
+		[<a href="https://arxiv.org/abs/2304.09116">Paper</a>] [<a href="https://www.reddit.com/r/singularity/comments/12rubq4/latent_diffusion_models_are_natural_and_zeroshot">Reddit Discussion</a>] [<a href="https://news.ycombinator.com/item?id=35627790">Hack News</a>]
+
+        <p class="fst-italic mb-0">
+			<br>
+			Kai Shen*, Zeqian Ju*, Xu Tan*, Yanqing Liu, Yichong Leng, Lei He, Tao Qin, Sheng Zhao, Jiang Bian <br>
+			<p></p>
+        </p>
+        <p><b>Microsoft Research Asia & Microsoft Azure Speech</b></p>
+	</div>
+	<p>
+        <b>Abstract.</b> 
+		While text-to-speech (TTS) systems (e.g., NaturalSpeech) have achieved high speech quality on single-speaker recording-studio datasets, these datasets are
+not enough to capture the diversity in human speech such as speaker identities, prosodies, styles (e.g., singing). When scaling to large-scale, multi-speaker, and in-
+the-wild datasets, current TTS systems usually quantize speech into discrete tokens and use language models to generate these tokens one by one, which suffer from
+unstable prosody, word skipping/repeating issue, and poor voice quality. In this paper, we develop NaturalSpeech 2, a TTS system that uses a latent diffusion model
+to synthesize natural voices with high expressiveness/robustness/fidelity and strong zero-shot ability. Specifically, we leverage a neural audio codec with residual
+vector quantizers to reconstruct speech waveform and get the quantized latent vectors, and then use a diffusion model to generate these latent vectors conditioned
+on text input. To enhance the zero-shot capability, we design a speech prompting mechanism to facilitate in-context learning in the duration/pitch predictor and
+diffusion model. We scale NaturalSpeech 2 to large-scale datasets with 44K hours of speech and singing data and evaluate its voice quality on unseen (zero-shot)
+speakers. NaturalSpeech 2 outperforms previous TTS systems by a large margin in terms of prosody/timbre similarity, robustness, and voice quality, and can perform
+novel zero-shot singing synthesis with only a speech prompt.
+		<br>
+		<br>
+		This research is done in alignment with Microsoft's responsible AI principles.
+		<br>
+		<br>
+			This page is <b> for research demonstration purposes </b> only.
+		<br>
+
+      </p>
+</div>
+		
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">		
+	<h2 id="model-overview" style="text-align: center;">Overview</h2>
+	<body>
+		<p style="text-align: center;">
+			<img src="pics/overview.png" width="800">
+		</p>
+	</body>
+	<p>
+		NaturalSpeech 2 consists of an audio codec encoder/decoder and a latent diffusion model conditioned on a prior (a phoneme encoder and a duration/pitch predictor).
+	</p>
+	<body>
+		<p style="text-align: center;">
+			<img src="pics/table1.png" width="600">
+		</p>
+	</body>
+	<p>
+		The comparison between NaturalSpeech 2 and previous large-scale TTS systems.
+	</p>
+
+
+</div>
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<h2 id="sr-samples" style="text-align: center;">LibriSpeech Samples</h2>
+		<div class="table-responsive pt-3">
+			<table class="table table-hover pt-2">
+			<thead>
+			<tr>
+			<th style="text-align: center">Text</th>
+			<th style="text-align: center">Prompt</th>
+			<th style="text-align: center">Ground Truth</th>
+			<th style="text-align: center">Baseline</th>
+			<th style="text-align: center">NaturalSpeech 2</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">Indeed, there were only one or two strangers who could be admitted among the sisters without producing the same result.</td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case1/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case1/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case1/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case1/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">For if he's anywhere on the farm, we can send for him in a minute.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case2/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case2/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case2/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case2/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">Their piety would be like their names, like their faces, like their clothes, and it was idle for him to tell himself that their humble and contrite hearts it might be paid a far-richer tribute of devotion than his had ever been. A gift tenfold more acceptable than his elaborate adoration.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case3/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case3/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case3/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case3/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">The air and the earth are curiously mated and intermingled as if the one were the breath of the other.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case5/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case5/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case5/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case5/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">I had always known him to be restless in his manner, but on this particular occasion he was in such a state of uncontrollable agitation that it was clear something very unusual had occurred.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case6/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case6/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case6/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case6/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">His death in this conjuncture was a public misfortune.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case8/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case8/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case8/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case8/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">It is this that is of interest to theory of knowledge.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case9/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case9/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case9/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case9/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">For a few miles, she followed the line hitherto presumably occupied by the coast of Algeria, but no land appeared to the south.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case10/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case10/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case10/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/librispeech_examples/case10/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+</div>
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<h2 id="sr-samples" style="text-align: center;">VCTK Samples</h2>
+		<div class="table-responsive pt-3">
+			<table class="table table-hover pt-2">
+			<thead>
+			<tr>
+			<th style="text-align: center">Text</th>
+			<th style="text-align: center">Prompt</th>
+			<th style="text-align: center">Ground Truth</th>
+			<th style="text-align: center">Baseline</th>
+			<th style="text-align: center">NaturalSpeech 2</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">It is an absolute nonsense.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case1/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case1/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case1/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case1/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">Truth is the child of time.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case2/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case2/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case2/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case2/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">We have a long way to go this week.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case3/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case3/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case3/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case3/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">Maybe we expected too much from the fixture.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case4/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case4/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case4/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case4/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">We will turn the corner.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case5/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case5/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case5/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case5/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">It will also require a lengthy series of clinical trials.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case6/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case6/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case6/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case6/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">Subs not used, McKenzie, Ritchie.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case7/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case7/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case7/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case7/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">That's the only thing I will say.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case9/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case9/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case9/yourtts.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/vctk_examples/case9/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+</div>
+
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<h2 id="sr-samples" style="text-align: center;">Samples compared with VALL-E</h2>
+		<div class="table-responsive pt-3">
+			<table class="table table-hover pt-2">
+			<thead>
+			<tr>
+			<th style="text-align: center">Text</th>
+			<th style="text-align: center">Prompt</th>
+			<th style="text-align: center">Ground Truth</th>
+			<th style="text-align: center">VALL-E</th>
+			<th style="text-align: center">NaturalSpeech 2</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+			<td style="text-align: left;vertical-align:middle;width: 500px">And lay me down in my cold bed and leave my shining lot.</td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case1/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case1/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case1/valle.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case1/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">Yea, his honourable worship is within, but he hath a godly minister or two with him, and likewise a leech.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case2/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case2/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case2/valle.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case2/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">The army found the people in poverty and left them in comparative wealth.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case3/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case3/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case3/valle.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case3/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">Thus did this humane and right minded father comfort his unhappy daughter, and her mother embracing her again, did all she could to soothe her feelings.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case4/reference.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case4/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case4/valle.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 160px;"><source src="audio/compare_with_valle/case4/ns.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+</div>
+
+
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<h2 id="sr-samples" style="text-align: center;">Singing Samples - &laquoYesterday Once More&raquo</h2>
+	<script src="lyric.js"></script>
+	<div class="table-responsive pt-3">
+		
+		<table class="table table-hover pt-2"> 
+		<thead>
+			<tr>
+				<th style="text-align: center">Lyric</th>
+				<th style="text-align: center">Prompt Type</th>
+				<th style="text-align: center">Prompt</th>
+				<th style="text-align: center">NaturalSpeech 2</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td style="text-align: center;vertical-align:middle;width: 300px"><div class="lyric1"></div></td>
+				<td style="text-align: center;vertical-align:middle;width: 150px">Speech</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 280px;"><source src="audio/singing/ref1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio class="player1" controls="controls" style="width: 280px;"><source src="audio/singing/infer1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: center;vertical-align:middle;width: 300px"><div class="lyric2"></div></td>
+				<td style="text-align: center;vertical-align:middle;width: 150px">Speech</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 280px;"><source src="audio/singing/ref2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio class="player2" controls="controls" style="width: 280px;"><source src="audio/singing/infer2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: center;vertical-align:middle;width: 300px"><div class="lyric3"></div></td>
+				<td style="text-align: center;vertical-align:middle;width: 150px">Singing</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 280px;"><source src="audio/singing/ref3.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio class="player3" controls="controls" style="width: 280px;"><source src="audio/singing/infer3.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>		
+		</tbody>
+		</table>
+	</div>
+</div>
+
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<h2 id="sr-samples" style="text-align: center;">Voice Conversion Samples</h2>
+	<script src="lyric.js"></script>
+	<div class="table-responsive pt-3">
+		
+		<table class="table table-hover pt-2"> 
+		<thead>
+			<tr>
+				<th style="text-align: center">Text</th>
+				<th style="text-align: center">Prompt</th>
+				<th style="text-align: center">Source</th>
+				<th style="text-align: center">NaturalSpeech 2</th>
+			</tr>
+		</thead>
+		<tbody>	
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">Traditions to overcome.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case1/ref.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case1/src.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case1/denoised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">The children the most blood-curdling ideas, to hate God, for instance.</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case2/ref.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case2/src.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case2/denoised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>	
+			<tr>
+				<td style="text-align: left;vertical-align:middle;width: 500px">Oh, Bartley, that old about my being hard!</td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case3/ref.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case3/src.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/vc/case3/denoised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+</div>
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+	<h2 id="sr-samples" style="text-align: center;">Speech Enhancement Samples</h2>
+	<script src="lyric.js"></script>
+	<div class="table-responsive pt-3">
+		
+		<table class="table table-hover pt-2"> 
+		<thead>
+			<tr>
+				<th style="text-align: center">Prompt</th>
+				<th style="text-align: center">Source</th>
+				<th style="text-align: center">Ground Truth</th>
+				<th style="text-align: center">NaturalSpeech 2</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case1/prompt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case1/noised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case1/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case1/denoised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>	
+			<tr>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case2/prompt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case2/noised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case2/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case2/denoised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>	
+			<tr>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case3/prompt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case3/noised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case3/gt.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+				<td style="text-align: center"><audio controls="controls" style="width: 250px;"><source src="audio/se/case3/denoised.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">	
+	<h2 id=Ethics-Statement style="text-align: center;">	
+		Ethics Statement
+	</h2>
+	<p>
+		Since NaturalSpeech2 could synthesize speech that maintains speaker identity, it may carry potential risks in misuse of the model, such as spoofing voice identification or impersonating a specific speaker. We conducted the experiments under the assumption that the user agree to be the target speaker in speech synthesis. If the model is generalized to unseen speakers in the real world, it should include a protocol to ensure that the speaker approves the use of their voice and a synthesized speech detection model.
+	</p>
+</div>
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">	
+	<h2 id=related-works style="text-align: center;">	
+		Other Related Works
+	</h2>
+	<p>
+		<a href="/naturalspeech/">NaturalSpeech: End-to-End Text to Speech Synthesis with Human-Level Quality</a>
+	</p>
+	
+	<p>
+		<a href="/">Speech research conducted at Microsoft Research Asia</a>
+	</p>
+
+</div>
+
+
+</article>
+</main>
+</div>
+
+</body>
+</html>
