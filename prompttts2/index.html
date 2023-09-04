@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.66.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/f8.4/styles/github.min.css">
+<link rel="stylesheet" href="../css/normalize.css">
+<link rel="stylesheet" href="../css/skeleton.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="alternate" href="index.xml" type="application/rss+xml" title="Speech Research">
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<title>PromptTTS 2: Describing and Generating Voices with Text Prompt - Speech Research</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+	</header>
+	<main role="main">
+		<article itemscope itemtype="https://schema.org/BlogPostinCg">
+            <h1 class="entry-title" itemprop="headline">PromptTTS 2: Describing and Generating Voices with Text Prompt</h1>
+
+			<section itemprop="entry-text">
+				<br>
+
+<h2 id="abstract">Abstract</h2>
+<p> Speech conveys more information than just text, as the same word can be uttered in various voices to convey diverse information. Compared to traditional text-to-speech (TTS) methods relying on speech prompts (reference speech) for voice variability, using text prompts (descriptions) is more user-friendly since speech prompts can be hard to find or may not exist at all. TTS approaches based on the text prompt face two challenges: 1) the one-to-many problem, where not all details about voice variability can be described in the text prompt, and 2) the limited availability of text prompt datasets, where vendors and large cost of data labeling are required to write text prompt for speech. In this work, we introduce PromptTTS 2 to address these challenges with a variation network to provide variability information of voice not captured by text prompts, and a prompt generation pipeline to utilize the large language models (LLM) to compose high quality text prompts. Specifically, the variation network predicts the representation extracted from the reference speech (which contains full information about voice) based on the text prompt representation. For the prompt generation pipeline, it generates text prompts for speech with a speech understanding model to recognize voice attributes (e.g., gender, speed) from speech and a large language model to formulate text prompt based on the recognition results. Experiments on a large-scale (44K hour) speech dataset demonstrate that compared to the previous works, PromptTTS 2 generates voices more consistent with text prompts and supports the sampling of diverse voice variability, thereby offering users more choices on voice generation. Additionally, the prompt generation pipeline produces high-quality prompts, eliminating the large labeling cost. The demo page of PromptTTS 2 is available online. </p>
+
+
+<h2 id="content">Content</h2>
+<b><a href="#audio samples">1. Audio Samples</a></b><br>
+<a href="#Part 1">1.1 Attribute Control</a><br>
+<a href="#Part 2">1.2 Timbre Variation</a><br>
+<a href="#Part 3">1.3 Extension on Face2Voice</a><br>
+
+<h2 id="audio samples">1. Audio Samples</h2>
+<p> The following parts are the audio samples from our system. We demonstrate from the following three aspects</p>
+<p> <b>Attribute Control</b>: we aim to show that we can control a specific attribute with the text prompts of different meanings.</p>
+<p> <b>Timbre Variation</b>: we aim to show that we can synthesize speech in the same timbre when changing the text prompt with the same intention, text content or sampling results of TTS backbone, while in the different timbre with different sampling results of variation network.</p>
+<p> <b>Extension on Face2Voice</b>: we aim to show that we can synthesize speech that matches the facial image.</p>
+
+
+<h3 id="Part 1">1.1 Attribute Control</h3>
+<p> Note that audio samples in this part are from our system, which show that our system can control a specific attribute with the text prompts of different meanings.</p>
+
+<h4 id="gender1">1.1.1 Gender</h4>
+<p>Gender-1: <em>Please ask a <b>man</b> with a normal voice to say: Fire a whole platoon, Major.</em></p>
+<p>Gender-2: <em>Please ask a <b>woman</b> with a normal voice to say: Fire a whole platoon, Major.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Gender-1</th>
+<th style="text-align: center">Gender-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="Speed1">1.1.2 Speed</h4>
+<p>Speed-1: <em>Please speak at a <b>slow speed</b>, gentleman: Him sorely and yet, it was but a woman's fancy, a passing fancy. She would become reconciled to the inevitable, as women do, and when her children came, she would grow accustomed to her sorrow. And her trouble would be forgotten in their laughter.</em></p>
+<p>Speed-2: <em>Please speak at a <b>normal speed</b>, gentleman: Him sorely and yet, it was but a woman's fancy, a passing fancy. She would become reconciled to the inevitable, as women do, and when her children came, she would grow accustomed to her sorrow. And her trouble would be forgotten in their laughter.</em></p>
+<p>Speed-3: <em>Please speak at a <b>fast speed</b>, gentleman: Him sorely and yet, it was but a woman's fancy, a passing fancy. She would become reconciled to the inevitable, as women do, and when her children came, she would grow accustomed to her sorrow. And her trouble would be forgotten in their laughter.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Speed-1</th>
+<th style="text-align: center">Speed-2</th>
+<th style="text-align: center">Speed-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio5.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio6.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio7.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="Pitch1">1.1.3 Pitch</h4>
+<p>Pitch-1: <em>She said in a <b>low pitch</b>: But it is not with a view to distinction that you should cultivate this talent, if you consult your own happiness.</em></p>
+<p>Pitch-2: <em>She said in a <b>normal pitch</b>: But it is not with a view to distinction that you should cultivate this talent, if you consult your own happiness.</em></p>
+<p>Pitch-3: <em>She said in a <b>high pitch</b>: But it is not with a view to distinction that you should cultivate this talent, if you consult your own happiness.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Pitch-1</th>
+<th style="text-align: center">Pitch-2</th>
+<th style="text-align: center">Pitch-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio13.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio12.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio11.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="Volume1">1.1.4 Volume</h4>
+<p>Volume-1: <em>Generate a boy's voice with a <b>low volume</b> for me: But their health and strength, child; they can never stand the severe application.</em></p>
+<p>Volume-2: <em>Generate a boy's voice with a <b>normal volume</b> for me: But their health and strength, child; they can never stand the severe application.</em></p>
+<p>Volume-3: <em>Generate a boy's voice with a <b>high volume</b> for me: But their health and strength, child; they can never stand the severe application.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Volume-1</th>
+<th style="text-align: center">Volume-2</th>
+<th style="text-align: center">Volume-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio19.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio20.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio21.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="Part 2">1.2 Timbre Variation</h3>
+<p> Note that audio samples in this part are from our system, which show that our system can synthesize speech in the same timbre when changing the text prompt with the same intention, text content or sampling results of TTS backbone, while in the different timbre with different sampling results of variation network.</p>
+<h5 id="vae1">1.2.1 Variation Network</h5>
+<p> We can change the timbre by altering the sampling results of the variation network while maintaining the speech consistent with the intention of the text prompt.</p>
+<p>Variation Network-[1, 2, 3]: <em>I want a <b>low pitched</b> <b>female</b> voice: Jason went back sadly and told the heroes what he had heard, and they leapt onshore and searched till gone. At dawn, they found the body all rolled in dust and blood among the corpses of those monstrous beasts.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Variation Network-1</th>
+<th style="text-align: center">Variation Network-2</th>
+<th style="text-align: center">Variation Network-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio38.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio39.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="prompt1">1.2.2 Text Prompt</h5>
+<p> Even if we change the text prompt with the same intention, the timbre will not be not be altered, which is exactly what we aim to achieve. </p>
+<p>Text Prompt-1: <em>I want a <b>low pitched</b> <b>female</b> voice: Jason went back sadly and told the heroes what he had heard, and they leapt onshore and searched till gone. At dawn, they found the body all rolled in dust and blood among the corpses of those monstrous beasts.</em></p>
+<p>Text Prompt-2: <em>This <b>madam</b> talks to me with a <b>deep</b> voice: Jason went back sadly and told the heroes what he had heard, and they leapt onshore and searched till gone. At dawn, they found the body all rolled in dust and blood among the corpses of those monstrous beasts.</em></p>
+<p>Text Prompt-3: <em><b>Decrease the pitch</b> of <b>her</b> voice for me: Jason went back sadly and told the heroes what he had heard, and they leapt onshore and searched till gone. At dawn, they found the body all rolled in dust and blood among the corpses of those monstrous beasts.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Text Prompt-1</th>
+<th style="text-align: center">Text Prompt-2</th>
+<th style="text-align: center">Text Prompt-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio29.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio30.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="text1">1.2.3 Text Content</h5>
+<p> Even if we change the text content, the timbre will not be not be altered, which is exactly what we aim to achieve.</p>
+<p>Text-1: <em>I want a <b>low pitched</b> <b>female</b> voice: Delaney had read one or two works on psychic phenomena and understood from them that spirit projection was not only quite feasible but far from uncommon.</em></p>
+<p>Text-2: <em>I want a <b>low pitched</b> <b>female</b> voice: And in this additional chapter to amplify and fortify, here and there, the result must necessarily be disconnected but a glance at the index will point the way to what is new.</em></p>
+<p>Text-3: <em>I want a <b>low pitched</b> <b>female</b> voice: If you wore the pink bonnet, I'll give it to you, and I'll back you up again, Mrs. Danvey. I think you might have done something with our member, as my father calls him, when you had him for so long in the house, but altogether.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Text Content-1</th>
+<th style="text-align: center">Text Content-2</th>
+<th style="text-align: center">Text Content-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio24.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio25.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio27.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="diffusion1">1.2.4 TTS Backbone</h5>
+<p> We cannot alter the timbre by changing the sampling results of TTS backbone.</p>
+<p>TTS Backbone-[1, 2, 3]: <em>I want a <b>low pitched</b> <b>female</b> voice: Jason went back sadly and told the heroes what he had heard, and they leapt onshore and searched till gone. At dawn, they found the body all rolled in dust and blood among the corpses of those monstrous beasts.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">TTS Backbone-1</th>
+<th style="text-align: center">TTS Backbone-2</th>
+<th style="text-align: center">TTS Backbone-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio33.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio34.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="Part 3">1.3 Extension on Face2Voice</h3>
+<p> Note that audio samples in this part are from our system, which show that our system can synthesize speech that matches the facial image.</p>
+
+<p>Ground Truth: <em>Face-1: That includes requiring background checks for students and other school employees, rights for student expulsion.</em></p>
+<p>Our System: <em>Face-1: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Face-1</th>
+<th style="text-align: center">Ground Truth</th>
+<th style="text-align: center">Our System</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><img src='../images/prompttts2/1.jpg'/></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio54.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio53.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Ground Truth: <em>Face-2: We currently know it. This is important that we listen to the people will be negatively impacted and everyone who cares deeply about the direction this budget will take.</em></p>
+<p>Our System: <em>Face-2: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Face-2</th>
+<th style="text-align: center">Ground Truth</th>
+<th style="text-align: center">Our System</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><img src='../images/prompttts2/2.jpg'/></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio60.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio55.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Ground Truth: <em>Face-3: Non-fiscal provision for me that would have devastating effects for our citizens. This budget also includes significant change.</em></p>
+<p>Our System: <em>Face-3: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Face-3</th>
+<th style="text-align: center">Ground Truth</th>
+<th style="text-align: center">Our System</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><img src='../images/prompttts2/3.jpg'/></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio57.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio56.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+<p>Ground Truth: <em>Face-4: I am taking those opportunities away from our kids and giving them to private schools that all interests.</em></p>
+<p>Our System: <em>Face-4: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Face-4</th>
+<th style="text-align: center">Ground Truth</th>
+<th style="text-align: center">Our System</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><img src='../images/prompttts2/4.jpg'/></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio59.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio58.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+</tbody>
+</table>
+
+      </section>
+		</article>
+	</main>
+
+</div>
+
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-139981676-1', 'auto');
+	ga('send', 'pageview');
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+         HTML: ["input/TeX","output/HTML-CSS"],
+         TeX: {
+                Macros: {
+                         bm: ["\\boldsymbol{#1}", 1],
+                         argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+                         argmin: ["\\mathop{\\rm arg\\,min}\\limits"]},
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+                equationNumbers: { autoNumber: "AMS" } },
+         extensions: ["tex2jax.js"],
+         jax: ["input/TeX","output/HTML-CSS"],
+         tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                    processEscapes: true },
+         "HTML-CSS": { availableFonts: ["TeX"],
+                       linebreaks: { automatic: true } }
+     });
+ </script>
+
+ <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+       tex2jax: {
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+       }
+     });
+ </script>
+
+ <script type="text/javascript" async
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+ </script>
+
+
+
+
+</body>
+</html>
