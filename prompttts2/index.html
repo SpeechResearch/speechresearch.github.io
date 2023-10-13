@@ -29,7 +29,7 @@
 <p>ArXiv: <a href="https://arxiv.org/abs/2309.02285">arXiv:2309.02285</a></p>
 
 <h2 id="abstract">Abstract</h2>
-<p> Speech conveys more information than just text, as the same word can be uttered in various voices to convey diverse information. Compared to traditional text-to-speech (TTS) methods relying on speech prompts (reference speech) for voice variability, using text prompts (descriptions) is more user-friendly since speech prompts can be hard to find or may not exist at all. TTS approaches based on the text prompt face two challenges: 1) the one-to-many problem, where not all details about voice variability can be described in the text prompt, and 2) the limited availability of text prompt datasets, where vendors and large cost of data labeling are required to write text prompt for speech. In this work, we introduce PromptTTS 2 to address these challenges with a variation network to provide variability information of voice not captured by text prompts, and a prompt generation pipeline to utilize the large language models (LLM) to compose high quality text prompts. Specifically, the variation network predicts the representation extracted from the reference speech (which contains full information about voice) based on the text prompt representation. For the prompt generation pipeline, it generates text prompts for speech with a speech understanding model to recognize voice attributes (e.g., gender, speed) from speech and a large language model to formulate text prompt based on the recognition results. Experiments on a large-scale (44K hours) speech dataset demonstrate that compared to the previous works, PromptTTS 2 generates voices more consistent with text prompts and supports the sampling of diverse voice variability, thereby offering users more choices on voice generation. Additionally, the prompt generation pipeline produces high-quality prompts, eliminating the large labeling cost. The demo page of PromptTTS 2 is available online. </p>
+<p> Speech conveys more information than text, as the same word can be uttered in various voices to convey diverse information. Compared to traditional text-to-speech (TTS) methods relying on speech prompts (reference speech) for voice variability, using text prompts (descriptions) is more user-friendly since speech prompts can be hard to find or may not exist at all. TTS approaches based on the text prompt face two main challenges: 1) the one-to-many problem, where not all details about voice variability can be described in the text prompt, and 2) the limited availability of text prompt datasets, where vendors and large cost of data labeling are required to write text prompts for speech. In this work, we introduce PromptTTS 2 to address these challenges with a variation network to provide variability information of voice not captured by text prompts, and a prompt generation pipeline to utilize the large language models (LLM) to compose high quality text prompts. Specifically, the variation network predicts the representation extracted from the reference speech (which contains full information about voice variability) based on the text prompt representation. For the prompt generation pipeline, it generates text prompts for speech with a speech language understanding model to recognize voice attributes (e.g., gender, speed) from speech and a large language model to formulate text prompts based on the recognition results. Experiments on a large-scale (44K hours) speech dataset demonstrate that compared to the previous works, PromptTTS 2 generates voices more consistent with text prompts and supports the sampling of diverse voice variability, thereby offering users more choices on voice generation. Additionally, the prompt generation pipeline produces high-quality text prompts, eliminating the large labeling cost. The demo page of PromptTTS 2 is available online. </p>
 
 
 <h2 id="content">Content</h2>
@@ -39,14 +39,16 @@
 <a href="#Part 3">1.3 Extension on Face2Voice</a><br>
 
 <h2 id="audio samples">1. Audio Samples</h2>
-<p> The following parts are the audio samples from our system. We demonstrate from the following three aspects</p>
+<p> We demonstrate the advantages of PromptTTS 2 through the following three aspects: </p>
 <p> <b>Attribute Control</b>: we aim to show that we can control a specific attribute with the text prompts of different meanings.</p>
-<p> <b>Timbre Variation</b>: we aim to show that we can synthesize speech in the same timbre when changing the text prompt with the same intention, text content or sampling results of TTS backbone, while in the different timbre with different sampling results of variation network.</p>
+<p> <b>Timbre Variation</b>: we aim to show that we can synthesize speech in the <b>different timbre</b> with different sampling results of variation network, while in the <b>same timbre</b> when changing the text prompt with the same intention, text content or sampling results of TTS backbone. In this case, the voice variability is mainly controlled by the variation network.</p>
 <p> <b>Extension on Face2Voice</b>: we aim to show that we can synthesize speech that matches the facial image.</p>
-
+<!--
+<p> <b>Comparison of Residual Style Control</b>: we aim to show we can control a specific residual style with the prompts of different meaning.</p>
+-->
 
 <h3 id="Part 1">1.1 Attribute Control</h3>
-<p> Note that audio samples in this part are from our system, which show that our system can control a specific attribute with the text prompts of different meanings.</p>
+<p> Note that audio samples in this part are from PromptTTS 2, PromptTTS, and InstructTTS, which show that PromptTTS 2 can control a specific attribute with the text prompts of different meanings.</p>
 
 <h4 id="gender1">1.1.1 Gender</h4>
 <p>Gender-1: <em>Please ask a <b>man</b> with a normal voice to say: Fire a whole platoon, Major.</em></p>
@@ -54,14 +56,26 @@
 <table>
 <thead>
 <tr>
+<th style="text-align: center">Model</th>
 <th style="text-align: center">Gender-1</th>
 <th style="text-align: center">Gender-2</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<th style="text-align: center">PromptTTS 2</th>
 <td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio1.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 <td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio2.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio3.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio4.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">InstructTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio5.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio6.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
@@ -73,6 +87,7 @@
 <table>
 <thead>
 <tr>
+<th style="text-align: center">Model</th>
 <th style="text-align: center">Speed-1</th>
 <th style="text-align: center">Speed-2</th>
 <th style="text-align: center">Speed-3</th>
@@ -80,9 +95,22 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio5.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio6.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<th style="text-align: center">PromptTTS 2</th>
 <td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio7.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio8.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio9.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio10.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio11.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio12.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">InstructTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio13.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio14.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio15.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
@@ -94,6 +122,7 @@
 <table>
 <thead>
 <tr>
+<th style="text-align: center">Model</th>
 <th style="text-align: center">Pitch-1</th>
 <th style="text-align: center">Pitch-2</th>
 <th style="text-align: center">Pitch-3</th>
@@ -101,9 +130,22 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio13.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio12.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio11.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<th style="text-align: center">PromptTTS 2</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio18.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio17.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio16.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio19.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio20.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio21.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">InstructTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio22.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio23.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio24.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
@@ -115,6 +157,7 @@
 <table>
 <thead>
 <tr>
+<th style="text-align: center">Model</th>
 <th style="text-align: center">Volume-1</th>
 <th style="text-align: center">Volume-2</th>
 <th style="text-align: center">Volume-3</th>
@@ -122,15 +165,28 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio19.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio20.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio21.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<th style="text-align: center">PromptTTS 2</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio27.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio28.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio29.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">PromptTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio26.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio25.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio30.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+</tr>
+<tr>
+<th style="text-align: center">InstructTTS</th>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio32.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio33.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
 
 <h3 id="Part 2">1.2 Timbre Variation</h3>
-<p> Note that audio samples in this part are from our system, which show that our system can synthesize speech in the same timbre when changing the text prompt with the same intention, text content or sampling results of TTS backbone, while in the different timbre with different sampling results of variation network.</p>
+<p> Note that audio samples in this part are from PromptTTS 2, which show that PromptTTS 2 can synthesize speech in the <b>different timbre</b> with different sampling results of variation network, while in the <b>same timbre</b> when changing the text prompt with the same intention, text content or sampling results of TTS backbone. In this case, the voice variability is mainly controlled by the variation network.</p>
 <h5 id="vae1">1.2.1 Variation Network</h5>
 <p> We can change the timbre by altering the sampling results of the variation network while maintaining the speech consistent with the intention of the text prompt.</p>
 <p>Variation Network-[1, 2, 3]: <em>I want a <b>low pitched</b> <b>female</b> voice: Jason went back sadly and told the heroes what he had heard, and they leapt onshore and searched till gone. At dawn, they found the body all rolled in dust and blood among the corpses of those monstrous beasts.</em></p>
@@ -144,9 +200,9 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio38.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio39.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio42.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio49.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio50.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
@@ -166,9 +222,9 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio29.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio30.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio42.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio40.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio41.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
@@ -188,9 +244,9 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio24.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio25.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio27.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio35.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio36.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio38.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
@@ -208,93 +264,105 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio31.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio33.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio34.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio42.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio44.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio45.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
 
 <h3 id="Part 3">1.3 Extension on Face2Voice</h3>
-<p> Note that audio samples in this part are from our system, which show that our system can synthesize speech that matches the facial image.</p>
+<p> Note that audio samples in this part are from PromptTTS 2, SP-FaceVC, and ground-truth voice (Ground-Truth) which show that PromptTTS 2 can synthesize speech that matches the facial image.</p>
 
-<p>Ground Truth: <em>Face-1: That includes requiring background checks for students and other school employees, rights for student expulsion.</em></p>
-<p>Our System: <em>Face-1: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
-<table>
+<p>PromptTTS 2: <em>Face-1: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
+<p>SP-FaceVC: <em>Face-1: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
+<p>Ground-Truth: <em>Face-1: That includes requiring background checks for students and other school employees, rights for student expulsion.</em></p>
+<table style="width: 1250px; table-layout: fixed;">
 <thead>
 <tr>
 <th style="text-align: center">Face-1</th>
-<th style="text-align: center">Ground Truth</th>
-<th style="text-align: center">Our System</th>
+<th style="text-align: center">PromptTTS 2</th>
+<th style="text-align: center">SP-FaceVC</th>
+<th style="text-align: center">Ground-Truth</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: center"><img src='../images/prompttts2/1.jpg'/></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio54.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio53.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio64.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio74.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio65.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
 
-<p>Ground Truth: <em>Face-2: We currently know it. This is important that we listen to the people will be negatively impacted and everyone who cares deeply about the direction this budget will take.</em></p>
-<p>Our System: <em>Face-2: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
-<table>
+<p>PromptTTS 2: <em>Face-2: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
+<p>SP-FaceVC: <em>Face-2: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
+<p>Ground-Truth: <em>Face-2: We currently know it. This is important that we listen to the people will be negatively impacted and everyone who cares deeply about the direction this budget will take.</em></p>
+<table style="width: 1250px; table-layout: fixed;">
 <thead>
 <tr>
 <th style="text-align: center">Face-2</th>
-<th style="text-align: center">Ground Truth</th>
-<th style="text-align: center">Our System</th>
+<th style="text-align: center">PromptTTS 2</th>
+<th style="text-align: center">SP-FaceVC</th>
+<th style="text-align: center">Ground-Truth</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: center"><img src='../images/prompttts2/2.jpg'/></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio60.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio55.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio66.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio72.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio71.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
 
-<p>Ground Truth: <em>Face-3: Non-fiscal provision for me that would have devastating effects for our citizens. This budget also includes significant change.</em></p>
-<p>Our System: <em>Face-3: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
-<table>
+<p>PromptTTS 2: <em>Face-3: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
+<p>SP-FaceVC: <em>Face-3: That summer is immigration, however, being mainly from the free states, greatly changed the relative strength of the two parties.</em></p>
+<p>Ground-Truth: <em>Face-3: Non-fiscal provision for me that would have devastating effects for our citizens. This budget also includes significant change.</em></p>
+<table style="width: 1250px; table-layout: fixed;">
 <thead>
 <tr>
 <th style="text-align: center">Face-3</th>
-<th style="text-align: center">Ground Truth</th>
-<th style="text-align: center">Our System</th>
+<th style="text-align: center">PromptTTS 2</th>
+<th style="text-align: center">SP-FaceVC</th>
+<th style="text-align: center">Ground-Truth</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: center"><img src='../images/prompttts2/3.jpg'/></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio57.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio56.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio67.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio75.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio68.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
 
-<p>Ground Truth: <em>Face-4: I am taking those opportunities away from our kids and giving them to private schools that all interests.</em></p>
-<p>Our System: <em>Face-4: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
-<table>
+<p>PromptTTS 2: <em>Face-4: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
+<p>SP-FaceVC: <em>Face-4: There was an average cost per lane for meter operation of 22 cents a year and each meter took care of an average of 17 lamps.</em></p>
+<p>Ground-Truth: <em>Face-4: I am taking those opportunities away from our kids and giving them to private schools that all interests.</em></p>
+<table style="width: 1250px; table-layout: fixed;">
 <thead>
 <tr>
 <th style="text-align: center">Face-4</th>
-<th style="text-align: center">Ground Truth</th>
-<th style="text-align: center">Our System</th>
+<th style="text-align: center">PromptTTS 2</th>
+<th style="text-align: center">SP-FaceVC</th>
+<th style="text-align: center">Ground-Truth</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: center"><img src='../images/prompttts2/4.jpg'/></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio59.wav" autoplay/>Your browser does not support the audio element.</audio></td>
-<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio58.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio69.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio73.wav" autoplay/>Your browser does not support the audio element.</audio></td>
+<td style="text-align: center"><audio controls="controls" ><source src="../audio/prompttts2/audio70.wav" autoplay/>Your browser does not support the audio element.</audio></td>
 </tr>
 </tbody>
 </table>
 
-      </section>
+			</section>
 		</article>
 	</main>
 
