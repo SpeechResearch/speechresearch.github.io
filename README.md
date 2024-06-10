@@ -1,6 +1,6 @@
 # Speech Research 
 
-This papge lists some speech related research at Microsoft Research Asia, conducted by team led by <a href="https://www.microsoft.com/en-us/research/people/xuta/">Xu Tan</a>. The research topics cover text to speech, singing voice synthesis, music generation, automatic speech recognition, etc. 
+This page lists some speech-related research conducted by the team led by <a href="https://www.microsoft.com/en-us/research/people/xuta/">Xu Tan</a>. The research topics cover text to speech, singing voice synthesis, music generation, automatic speech recognition, etc. 
 
 Some related links: 
 
